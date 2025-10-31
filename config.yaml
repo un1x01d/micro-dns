@@ -1,6 +1,10 @@
 # Port to bind the resolver (must be >1024 for non-root users)
 listen_port: "1053"
 
+# Optional bind enterface listening
+# Leave blank or omit to listen on all interfaces
+# bind_address: "127.0.0.1"
+
 # Path to the DNS zone file
 hosts_file: "zones.txt"
 
@@ -13,4 +17,3 @@ poll_freq: 5
 # Optional fallback DNS server (UDP only)
 # Leave blank or omit to disable fallback
 fallback_dns: "8.8.8.8:53"
-

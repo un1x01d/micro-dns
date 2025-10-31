@@ -17,6 +17,7 @@ import (
 
 type Config struct {
 	ListenPort  string `yaml:"listen_port"`
+	BindAddress string `yaml:"bind_address"`
 	HostsFile   string `yaml:"hosts_file"`
 	LogLevel    string `yaml:"log_level"`
 	PollFreq    int    `yaml:"poll_freq"`
@@ -47,6 +48,7 @@ func loadConfig(path string) error {
 func parseFlags() {
 	configPath := flag.String("config", "config.yaml", "Path to config file")
 	port := flag.String("port", "", "Listen port")
+	bindaddr := flag.String("bindaddr", "", "Binding address")
 	zones := flag.String("zones", "", "Zone file path")
 	fallback := flag.String("fallback", "", "Fallback DNS (e.g. 8.8.8.8:53)")
 	poll := flag.Int("poll", 0, "Zone file reload frequency (seconds)")
@@ -61,7 +63,11 @@ func parseFlags() {
 	} else if *port != "" {
 		config.ListenPort = *port
 	}
-
+ 	
+	if *bindaddr != "" {
+                config.BindAddress = *bindaddr
+    }
+	
 	if *zones != "" {
 		config.HostsFile = *zones
 	}
@@ -268,7 +274,7 @@ func main() {
 	go reloadZoneIfChanged()
 
 	dns.HandleFunc(".", handleDNSRequest)
-	server := &dns.Server{Addr: ":" + config.ListenPort, Net: "udp"}
+	server := &dns.Server{Addr: config.BindAddress + ":" + config.ListenPort, Net: "udp"}
 	fmt.Printf("DNS resolver listening on UDP port %s\n", config.ListenPort)
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
